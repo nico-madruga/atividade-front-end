@@ -1,0 +1,35 @@
+O que construir no HTML
+Um título com o nome do mascote.
+
+Um texto com o status atual (ex: "O Bob está com fome 😿").
+
+Um contador de comidinhas dando um número (ex: "Comidas dadas: 0").
+
+Dois botões: "Alimentar" e "Trocar Cor do Fundo".
+
+Os conceitos de DOM que você vai treinar nele
+document.querySelector() (Selecionar o elemento)
+Usado para "pescar" as coisas do seu HTML para dentro do JavaScript.
+
+Selecionar o botão de alimentar.
+
+Selecionar o texto da fome.
+
+Selecionar o contador.
+
+addEventListener('click', ...) (Escutar ação)
+Usado para fazer o JavaScript reagir quando o usuário clica em algo.
+
+Quando clicar no botão "Alimentar", dispara uma função.
+
+textContent ou innerHTML (Mudar o texto)
+Usado para alterar a mensagem na tela.
+
+Mudar de "O Bob está com fome 😿" para "O Bob está feliz! 😸".
+
+Aumentar o número do contador a cada clique.
+
+style ou classList (Mudar o visual)
+Usado para alterar o CSS direto pelo JS.
+
+Mudar a cor do fundo do cartão de vermelho (fome) para verde (satisfeito).
