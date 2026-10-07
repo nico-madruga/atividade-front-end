@@ -1,45 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Galeto Master</title>
     <link rel="stylesheet" href="style.css">
-    
+
 </head>
+
 <body class="flex flex-column items-center justi">
     <h1>Galeto Master</h1>
 
-    <div class="masote">
-        <img src="masote.jpg">
-    </div>
-    
-    <div class="masote-trite">
-        <img src="masotetrite.jpg">
+    <div id="masote-container">
+        <div class="masote">
+            <img src="/front-end/imgs/masote.jpg">
+        </div>
+
+        <div class="masote-trite">
+            <img src="/front-end/imgs/masotetrite.jpg">
+        </div>
+
+        <div class="texto-fome">
+            <p>O Galeto está com fome 😿</p>
+        </div>
     </div>
 
-    <div class="texto-fome">
-        <p>O Galeto está com fome 😿</p>
+    <div id="interacoes">
+        <div class="contador">
+            <p>Comidas dadas: <span data-contador="0">0</span></p>
+        </div>
+
+        <div class="botoes">
+            <button id="btn-alimentar" data-acao="alimentar">
+                Alimentar
+            </button>
+        </div>
+
+        <div id="trocar-cor-fundo">
+            <button id="btn-fundo" data-acao="trocar-fundo">
+                Trocar cor do fundo
+            </button>
+        </div>
+
+        <input id="inserir" type="text" placeholder="Insira o que você vai dar ao Galeto" required>
+
     </div>
 
-    <div class="contador">
-        <p>Comidas dadas: <span data-contador="0">0</span></p>
+
+    <div id="lista-tarefas-container">
+
     </div>
 
-    <div class="botoes">
-        <button id="btn-alimentar" data-acao="alimentar">
-            Alimentar
-        </button>
-    </div>
+    <ul class="lista-tarefas">
 
-    <div id="trocar-cor-fundo">
-        <button id="btn-fundo" data-acao="trocar-fundo">
-            Trocar cor do fundo
-        </button>
+    </ul>
     </div>
-
-    <input id="inserir" type="text" placeholder="Insira o que você vai dar ao Galeto" required>
-    
-    <script src="app.js" defer></script>
+    <script type="module" src="/front-end/app.js" defer></script>
 </body>
+
 </html>

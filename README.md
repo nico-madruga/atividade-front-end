@@ -50,9 +50,9 @@ const elementList = baseElement.querySelectorAll(selectors);
 Nicolas Madruga Sousa):**
 > A função addEventListener adiciona um "sensor" para algum elemento específico que você atribuiu com o querySelectorAll, por exemplo:
 ```javascript
-const botao = document.selectQuery("#botaoPrincipal");
+const botaoAlimentar = document.selectQuery("[data-acao="alimentar"]");
 
-botao.addEventListener("click", () => {
+botaoAlimentar.addEventListener("click", () => {
     //função
 })
 ```
@@ -61,10 +61,10 @@ botao.addEventListener("click", () => {
 
 >Porém, o navegador tem um comportamento padrão de recarregar a página sempre que fazemos alguma submissão de formulário, o que traz uma péssima experiência de usuário, então adicionamos a função event.preventDefault();
 ```javascript
-const botao = document.selectQuery("#botaoPrincipal");
+const botaoAlimentar = document.selectQuery("[data-acao="alimentar"]");
 
 //adicionado um parâmetro para referenciar um evento
-botao.addEventListener("click", (event) => {
+botaoAlimentar.addEventListener("click", (event) => {
     //função para evitar o recarregamento da página.
     event.preventDefault();
     //função
@@ -73,14 +73,20 @@ botao.addEventListener("click", (event) => {
 >Assim, evitamos o recarregamento automático da página.
 
 * **Captura e Limpeza de Inputs (Explicado por Artur Miguel Schlichting):**
-> *Explique como capturamos a propriedade .value do
-input e fazemos a validação com .trim()...*
+```javascript
+let mensagem = inserir.value.trim();
+```
+>A captura começa no **inserir.value** que pega tudo que o usuário insere no bloco input no html
+```html
+<input id="inserir" type="text" placeholder="Insira o que você vai dar ao Galeto" required>
+``` 
+>Assim essa função cria um **let mensagem** que vai pegar esse input e vai fazer a limpeza de espaços com o .trim(), que retira todos os espaços vazios que sobram no começo e no final da string
 ---
 ### 3. Criação e Remoção Dinâmica de Elementos
 * **Criação de Nós Dinâmicos (Explicado por Nicolas Madruga Sousa):**
 >O document.createElement cria um elemento novo direto da memória do navegador:
 ```javascript
-const meuElemento = document.createElement('NOME_DA_TAG');
+const topico = document.createElement('li');
 ```
 
 >O classList.add adiciona uma classe a algum elemento HTML:
@@ -116,8 +122,18 @@ elementoPai.appendChild(elementoFilho);
 ```
 
 * **Navegação no DOM e Exclusão (Explicado por Artur Miguel Schlichting):**
-> *Explique como o parentElement localiza a tag pai e
-como o método .remove() apaga a tarefa...*
+> A navegação **parentElement** acessa o elemento filho criado para acessar o elemento pai no HTML e remove o pai acessando o filho, o **.parentElement** 
+> serve para acessar as propriedades do elemento filho assim sendo possível remover o elemento. Exemplo:
+```javascript
+const botaoFundo = document.querySelector('[data-acao="trocar-fundo"]');
+
+botaoFundo.addEventListener("click", () => {
+    document.body.style.backgroundColor = gerarCorAleatoria();
+})
+
+botaoFundo.parentElement.remove();
+```
+> Nesse exemplo ele cria o elemento filho pegado do elemento pai **[data-acao="trocar-fundo"]**, utiliza ele para uma função e depois remove o pai acessando pelo filho.
 ---
 ### 4. Arquitetura Modular e Estilização
 * **Módulos JS com import e export (Explicado por Nicolas Madruga Sousa):**
