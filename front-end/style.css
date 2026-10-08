@@ -1,44 +1,697 @@
+@import url("https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=Nunito:wght@600;800;900&display=swap");
+
+/* =====================================================================
+   GALETO MASTER — style.css
+   Só CSS: HTML e JS ficam exatamente como estão.
+
+   Como o JS mexe no visual (e o CSS já cuida disso):
+   - botão Alimentar  -> troca .masote / .masote-trite via style.display
+   - botão de fundo   -> style.backgroundColor aleatório no <body>
+   - lista de tarefas -> cria input, button, li, checkbox e "Excluir"
+   Estado "com fome" -> "satisfeito" é detectado com :has() no
+   style="display: block" que o JS coloca na .masote.
+   ===================================================================== */
+
+
+/* ---------- 1. TOKENS ---------- */
+:root {
+    color-scheme: light;
+
+    --ink: #1b2a41;
+    --paper: #ffffff;
+    --yellow: #ffd23f;
+    --pink: #ff8fab;
+    --mint: #9fd8b8;
+    --muted: #5b6980;
+    --focus: #1f4fff;
+
+    --hungry: #d62839;
+    --hungry-soft: #ffd9d4;
+    --sated: #3ddc84;
+    --sated-soft: #d3f5e0;
+
+    /* estado atual (muda sozinho quando o Galeto é alimentado) */
+    --state: var(--hungry);
+    --state-soft: var(--hungry-soft);
+    --on-state: #ffffff;
+
+    --font-display: "Bagel Fat One", "Arial Rounded MT Bold", "Trebuchet MS", system-ui, sans-serif;
+    --font-body: "Nunito", "Trebuchet MS", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+    --pad: clamp(1rem, 3.5vw, 2.5rem);
+    --gap: clamp(1rem, 2.4vw, 1.75rem);
+    --bw: 3px;
+    --bw-card: 4px;
+    --owl-ratio: 4 / 3;
+}
+
+body:has(.masote[style*="block"]) {
+    --state: var(--sated);
+    --state-soft: var(--sated-soft);
+    --on-state: var(--ink);
+}
+
+
+/* ---------- 2. BASE ---------- */
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+}
+
+img {
+    max-width: 100%;
+}
+
+::selection {
+    background: var(--yellow);
+    color: var(--ink);
+}
+
 body {
+    margin: 0;
+    margin-inline: auto;
+    width: min(100%, 76rem);
+    min-height: 100vh;
+    min-height: 100dvh;
+    padding: var(--pad);
+
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+        "title"
+        "mascot"
+        "controls"
+        "taskform"
+        "tasklist";
+    align-content: start;
+    gap: var(--gap);
+
+    font-family: var(--font-body);
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.45;
+    color: var(--ink);
+
+    /* a cor sólida é a que o botão "Trocar cor do fundo" sobrescreve;
+       chuva + luz ficam por cima e funcionam com qualquer cor sorteada */
+    background-color: var(--mint);
+    background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140' viewBox='0 0 140 140'%3E%3Cg fill='none' stroke='%23ffffff' stroke-opacity='.55' stroke-width='3' stroke-linecap='round'%3E%3Cpath d='M20 12l-5 14M92 30l-5 14M52 70l-5 14M118 96l-5 14M22 112l-4 11M76 118l-5 14M128 8l-4 11'/%3E%3C/g%3E%3C/svg%3E"),
+        radial-gradient(120% 70% at 50% -10%, rgb(255 255 255 / 0.55), transparent 60%),
+        linear-gradient(to top, rgb(27 42 65 / 0.16), transparent 30%);
+    background-size: 140px 140px, auto, auto;
+    background-repeat: repeat, no-repeat, no-repeat;
+}
+
+h1 {
+    grid-area: title;
+    justify-self: start;
+    max-width: 100%;
+    margin: 0 0 0.35rem;
+    padding: 0.12em 0.42em 0.2em;
+
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(2.15rem, 1rem + 5.6vw, 4.75rem);
+    line-height: 0.98;
+    letter-spacing: 0.005em;
+    text-wrap: balance;
+    overflow-wrap: anywhere;
+
+    color: var(--yellow);
+    background: var(--ink);
+    border-radius: 1.1rem;
+    box-shadow: 0.09em 0.09em 0 var(--state);
+    transform: rotate(-2deg);
+    transform-origin: left center;
+    transition: box-shadow 0.5s ease;
+}
+
+
+/* ---------- 3. MASCOTE ---------- */
+#masote-container {
+    grid-area: mascot;
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 1rem;
-    background-color: rgba(255, 255, 255, 0.897)
+    padding: clamp(0.75rem, 2vw, 1.1rem);
+
+    background-color: var(--state-soft);
+    border: var(--bw-card) solid var(--ink);
+    border-radius: 2rem;
+    box-shadow: 0.6rem 0.6rem 0 var(--ink);
+    transition: background-color 0.5s ease;
 }
 
-img
-{
-    width: 25rem;
-    height: 15rem;
+.masote,
+.masote-trite {
+    width: 100%;
 }
 
-.masote-trite
-{
+/* mesma lógica do projeto original: começa triste, o JS troca */
+.masote-trite {
     display: block;
 }
 
-.masote
-{
+.masote {
+    display: none;
+    animation: owl-pop 0.7s ease-out backwards;
+}
+
+#masote-container img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: var(--owl-ratio);
+    max-height: 44rem;
+    max-height: min(68svh, 44rem);
+    object-fit: cover;
+    object-position: 50% 22%;
+    background: var(--state-soft);
+    border: var(--bw) solid var(--ink);
+    border-radius: 1.2rem;
+}
+
+.texto-fome {
+    position: relative;
+    width: 100%;
+    margin-top: 0.3rem;
+}
+
+.texto-fome p {
+    position: relative;
+    margin: 0;
+    padding: 0.85rem 1.1rem;
+    text-align: center;
+    text-wrap: balance;
+    font-weight: 900;
+    font-size: clamp(1.05rem, 0.95rem + 0.7vw, 1.35rem);
+    line-height: 1.25;
+
+    color: var(--on-state);
+    background-color: var(--state);
+    border: var(--bw) solid var(--ink);
+    border-radius: 1.1rem;
+    transition: background-color 0.5s ease, color 0.5s ease;
+}
+
+/* rabinho do balão apontando pro Galeto */
+.texto-fome p::before {
+    content: "";
+    position: absolute;
+    top: -0.62rem;
+    left: 1.7rem;
+    width: 1rem;
+    height: 1rem;
+    background-color: var(--state);
+    border-top: var(--bw) solid var(--ink);
+    border-left: var(--bw) solid var(--ink);
+    transform: rotate(45deg);
+    transition: background-color 0.5s ease;
+}
+
+/* confete: dispara uma vez quando o Galeto fica satisfeito */
+#masote-container::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    background:
+        radial-gradient(circle at 8% 22%, var(--yellow) 0 0.5rem, transparent 0.55rem),
+        radial-gradient(circle at 20% 6%, var(--pink) 0 0.4rem, transparent 0.45rem),
+        radial-gradient(circle at 40% 2%, var(--sated) 0 0.5rem, transparent 0.55rem),
+        radial-gradient(circle at 66% 4%, var(--yellow) 0 0.4rem, transparent 0.45rem),
+        radial-gradient(circle at 92% 18%, var(--pink) 0 0.55rem, transparent 0.6rem),
+        radial-gradient(circle at 97% 52%, #4cc9f0 0 0.45rem, transparent 0.5rem),
+        radial-gradient(circle at 90% 90%, var(--yellow) 0 0.5rem, transparent 0.55rem),
+        radial-gradient(circle at 58% 98%, var(--sated) 0 0.4rem, transparent 0.45rem),
+        radial-gradient(circle at 22% 96%, var(--pink) 0 0.55rem, transparent 0.6rem),
+        radial-gradient(circle at 3% 70%, #4cc9f0 0 0.45rem, transparent 0.5rem),
+        radial-gradient(circle at 5% 44%, var(--yellow) 0 0.4rem, transparent 0.45rem);
+}
+
+body:has(.masote[style*="block"]) #masote-container::after {
+    animation: confetti 1.1s ease-out both;
+}
+
+
+/* ---------- 4. INTERAÇÕES (contador + botões + input) ---------- */
+#interacoes {
+    grid-area: controls;
+    display: grid;
+    /* 2 colunas quando cabe, 1 quando não cabe — sem breakpoint.
+       o 45% garante no máximo 2 colunas; 14.5rem evita quebra do texto do botão */
+    grid-template-columns: repeat(auto-fit, minmax(max(14.5rem, 45%), 1fr));
+    gap: 0.9rem;
+    padding: clamp(1rem, 2.5vw, 1.5rem);
+
+    background: var(--paper);
+    border: var(--bw-card) solid var(--ink);
+    border-radius: 1.75rem;
+    box-shadow: 0.5rem 0.5rem 0 var(--ink);
+}
+
+/* ordem visual: contador > texto > alimentar > fundo */
+.contador {
+    order: 1;
+    grid-column: 1 / -1;
+    padding: 0.7rem 0.7rem 0.7rem 1.1rem;
+    background-color: var(--state-soft);
+    border: var(--bw) solid var(--ink);
+    border-radius: 1.2rem;
+    transition: background-color 0.5s ease;
+}
+
+.contador p {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin: 0;
+    font-weight: 900;
+    font-size: clamp(1.05rem, 0.95rem + 0.5vw, 1.3rem);
+    line-height: 1.2;
+}
+
+.contador span[data-contador] {
+    display: inline-grid;
+    place-items: center;
+    min-width: 3.4ch;
+    padding: 0.12em 0.45em 0.18em;
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: clamp(2.2rem, 1.8rem + 2vw, 3rem);
+    line-height: 1;
+    font-variant-numeric: tabular-nums;
+    color: var(--yellow);
+    background: var(--ink);
+    border-radius: 1rem;
+    box-shadow: 0.2rem 0.2rem 0 var(--state);
+    transition: box-shadow 0.5s ease;
+}
+
+#inserir {
+    order: 2;
+    grid-column: 1 / -1;
+}
+
+.botoes {
+    order: 3;
+}
+
+#trocar-cor-fundo {
+    order: 4;
+}
+
+#interacoes button {
+    width: 100%;
+}
+
+
+/* ---------- 5. FORMULÁRIO DE TAREFAS (criado pelo JS) ---------- */
+#lista-tarefas-container {
+    grid-area: taskform;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.75rem;
+    align-items: stretch;
+}
+
+
+/* ---------- 6. LISTA DE TAREFAS ---------- */
+.lista-tarefas {
+    grid-area: tasklist;
+    display: grid;
+    gap: 0.75rem;
+    align-content: start;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.lista-tarefas:not(:has(li)) {
     display: none;
 }
 
-#masote-container
-{
+.lista-tarefas li {
     display: flex;
-    flex-direction: column;
     align-items: center;
+    gap: 0.85rem;
+    padding: 0.75rem 0.85rem 0.75rem 1rem;
+    overflow-wrap: anywhere;
+    font-weight: 800;
+    font-size: 1.05rem;
+    line-height: 1.3;
+
+    background: var(--paper);
+    border: var(--bw) solid var(--ink);
+    border-radius: 1.1rem;
+    box-shadow: 0.3rem 0.3rem 0 var(--ink);
+    transition: background-color 0.25s ease, color 0.25s ease, transform 0.2s ease, box-shadow 0.2s ease;
+    animation: task-in 0.3s ease-out backwards;
 }
 
-#interacoes
-{
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    align-items: center;
+/* o JS põe o texto, depois o checkbox, depois o botão:
+   o checkbox vai pra frente com order, o botão vai pra direita */
+.lista-tarefas li input[type="checkbox"] {
+    order: -1;
 }
 
-#lista-tarefas-container
-{
-    display: flex;
-    flex-direction: column;
+.lista-tarefas li button {
+    margin-left: auto;
+    flex: none;
+}
+
+.lista-tarefas li:has(input:checked) {
+    color: var(--muted);
+    background: var(--sated-soft);
+    box-shadow: 0.1rem 0.1rem 0 var(--ink);
+    transform: translate(0.2rem, 0.2rem);
+}
+
+
+/* ---------- 7. BOTÕES ---------- */
+button {
+    --lift: 0.3rem;
+
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    min-height: 3rem;
+    padding: 0.7rem 1.3rem;
+
+    font: inherit;
+    font-weight: 900;
+    font-size: 1rem;
+    line-height: 1.1;
+    text-align: center;
+    color: var(--ink);
+
+    background: var(--paper);
+    border: var(--bw) solid var(--ink);
+    border-radius: 999px;
+    box-shadow: 0 var(--lift) 0 var(--ink);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: transform 0.12s ease, box-shadow 0.12s ease, background-color 0.2s ease, color 0.2s ease;
+}
+
+@media (hover: hover) {
+    button:hover {
+        transform: translateY(-0.12rem);
+        box-shadow: 0 calc(var(--lift) + 0.12rem) 0 var(--ink);
+    }
+}
+
+button:active {
+    transform: translateY(calc(var(--lift) - 0.05rem));
+    box-shadow: 0 0.05rem 0 var(--ink);
+}
+
+button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 var(--lift) 0 var(--ink);
+}
+
+#btn-alimentar {
+    min-height: 3.4rem;
+    font-size: 1.15rem;
+    background: var(--yellow);
+}
+
+#btn-alimentar::before {
+    content: "🍗";
+    content: "🍗" / "";
+}
+
+#btn-fundo {
+    background: var(--pink);
+}
+
+#btn-fundo::before {
+    content: "🎨";
+    content: "🎨" / "";
+}
+
+#lista-tarefas-container button {
+    background: var(--sated);
+}
+
+#lista-tarefas-container button::before {
+    content: "+";
+    content: "+" / "";
+    font-size: 1.5em;
+    line-height: 0.7;
+}
+
+.lista-tarefas li button {
+    --lift: 0.2rem;
+    min-height: 2.5rem;
+    padding: 0.4rem 0.95rem;
+    font-size: 0.9rem;
+    color: var(--hungry);
+}
+
+@media (hover: hover) {
+    .lista-tarefas li button:hover {
+        color: #ffffff;
+        background: var(--hungry);
+    }
+}
+
+
+/* ---------- 8. CAMPOS ---------- */
+input:not([type="checkbox"]) {
+    appearance: none;
+    width: 100%;
+    min-width: 0;
+    min-height: 3rem;
+    padding: 0.7rem 1rem;
+
+    font: inherit;
+    font-weight: 700;
+    color: var(--ink);
+
+    background: var(--paper);
+    border: var(--bw) solid var(--ink);
+    border-radius: 0.9rem;
+    text-overflow: ellipsis;
+    transition: box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+input:not([type="checkbox"])::placeholder {
+    color: var(--muted);
+    opacity: 1;
+}
+
+input:not([type="checkbox"]):focus {
+    box-shadow: 0.25rem 0.25rem 0 var(--yellow);
+}
+
+@media (max-width: 26rem) {
+    input:not([type="checkbox"])::placeholder {
+        font-size: 0.86em;
+        letter-spacing: -0.01em;
+    }
+}
+
+#inserir:user-invalid {
+    background: #fff5f4;
+    border-color: var(--hungry);
+}
+
+.lista-tarefas li input[type="checkbox"] {
+    appearance: none;
+    flex: none;
+    width: 1.9rem;
+    height: 1.9rem;
+    margin: 0;
+    cursor: pointer;
+    background: var(--paper) center / 72% no-repeat;
+    border: var(--bw) solid var(--ink);
+    border-radius: 0.55rem;
+    transition: background-color 0.15s ease;
+}
+
+.lista-tarefas li input[type="checkbox"]:checked {
+    background-color: var(--sated);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%231b2a41' stroke-width='4.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12.5l4.5 4.5L19 7'/%3E%3C/svg%3E");
+}
+
+:where(button, input):focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 3px;
+}
+
+
+/* ---------- 9. ANIMAÇÕES (todas respondem a uma ação do usuário) ---------- */
+@keyframes owl-pop {
+    0%   { transform: scale(0.84) rotate(-5deg); }
+    60%  { transform: scale(1.025) rotate(1.5deg); }
+    100% { transform: none; }
+}
+
+@keyframes confetti {
+    0%   { opacity: 1; transform: scale(0.3); }
+    60%  { opacity: 1; }
+    100% { opacity: 0; transform: scale(1); }
+}
+
+@keyframes task-in {
+    from { opacity: 0; transform: translateY(-0.6rem) scale(0.98); }
+    to   { opacity: 1; transform: none; }
+}
+
+
+/* ---------- 10. RESPONSIVO ---------- */
+
+/* celulares bem estreitos (320–360px) */
+@media (max-width: 24rem) {
+    :root {
+        --bw-card: 3px;
+    }
+
+    #masote-container {
+        border-radius: 1.5rem;
+        box-shadow: 0.4rem 0.4rem 0 var(--ink);
+    }
+
+    #interacoes {
+        border-radius: 1.4rem;
+        box-shadow: 0.35rem 0.35rem 0 var(--ink);
+    }
+
+    #lista-tarefas-container {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .lista-tarefas li {
+        gap: 0.65rem;
+        padding-left: 0.8rem;
+    }
+}
+
+/* telas mínimas (320px) */
+@media (max-width: 22.5rem) {
+    :root {
+        --pad: 0.75rem;
+    }
+
+    #interacoes {
+        padding: 0.8rem;
+    }
+
+    .contador p {
+        font-size: 1rem;
+    }
+
+    input:not([type="checkbox"]) {
+        padding-inline: 0.75rem;
+    }
+
+    input:not([type="checkbox"])::placeholder {
+        font-size: 0.78em;
+    }
+}
+
+/* tablet / desktop (e celular deitado): mascote à esquerda, o resto à direita */
+@media (min-width: 48rem),
+       (min-width: 34rem) and (max-height: 32rem) and (orientation: landscape) {
+    :root {
+        --owl-ratio: 512 / 750;
+    }
+
+    body {
+        grid-template-columns: clamp(16rem, 36vw, 27rem) minmax(0, 1fr);
+        grid-template-areas:
+            "title    title"
+            "mascot   controls"
+            "mascot   taskform"
+            "mascot   tasklist";
+        grid-template-rows: auto auto auto 1fr;
+        column-gap: calc(var(--gap) + 0.5rem);
+    }
+
+    #masote-container {
+        align-self: start;
+    }
+}
+
+/* só gruda o mascote se a tela tiver altura pra isso */
+@media (min-width: 48rem) and (min-height: 46rem) {
+    #masote-container {
+        position: sticky;
+        top: var(--pad);
+    }
+}
+
+/* celular deitado ou janela baixa */
+@media (max-height: 32rem) and (orientation: landscape) {
+    :root {
+        --pad: 0.75rem;
+    }
+
+    h1 {
+        font-size: clamp(1.8rem, 5vw, 2.6rem);
+    }
+}
+
+/* telas grandes: tudo cresce junto (tudo usa rem) */
+@media (min-width: 100rem) {
+    html {
+        font-size: 112.5%;
+    }
+}
+
+/* dedo grosso: alvos de toque maiores */
+@media (pointer: coarse) {
+    button {
+        min-height: 3.2rem;
+    }
+
+    .lista-tarefas li button {
+        min-height: 2.8rem;
+    }
+
+    .lista-tarefas li input[type="checkbox"] {
+        width: 2.1rem;
+        height: 2.1rem;
+    }
+}
+
+
+/* ---------- 11. ACESSIBILIDADE ---------- */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+@media (forced-colors: active) {
+    button,
+    input,
+    #masote-container,
+    #interacoes,
+    .contador,
+    .texto-fome p,
+    .lista-tarefas li {
+        border-color: CanvasText;
+    }
 }
